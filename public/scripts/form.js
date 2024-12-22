@@ -72,6 +72,9 @@ form.addEventListener('submit', (e) => {
     .catch((error) => {
       console.error('Error:', error);
     });
+
+  // empties the field for the captcha after submitting
+  document.querySelector('#captcha').value = '';
 });
 
 // function to getNewCaptcha
