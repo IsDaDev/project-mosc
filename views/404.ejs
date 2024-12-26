@@ -9,26 +9,30 @@
     />
     <title>404 not found</title>
     <style>
-      /* styling to center the text and move it down a little */
+      body {
+        background-color: rgb(76, 78, 77);
+      }
+
       .error {
-        margin-top: 10%;
         text-align: center;
+        margin-top: 20%;
+      }
+
+      .error button {
+        background-color: black;
+        color: white;
+        width: 100px;
+        height: 50px;
       }
     </style>
   </head>
   <body id="404">
     <div class="error">
       <h1>Seems like the page you requested could not be found</h1>
+      <p>(This page may not be pretty, but it works)</p>
       <h2><%= message %></h2>
       <button id="returnButton"><a>Back</a></button>
     </div>
-    <footer>
-      <p>&copy; 2024 MOSC</p>
-      <div class="footer-links">
-        <p><a href="/impressum">impressum</a></p>
-        <p><a href="/privacy">privacy</a></p>
-      </div>
-    </footer>
     <script>
       // selects the button to return to the galler
       const returnButton = document.querySelector('#returnButton');
