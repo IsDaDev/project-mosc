@@ -100,19 +100,22 @@
         <h2>We present you the car of the month</h2>
         <div class="COTD">
           <!-- displays the information about a random car -->
-          <div class="card" data-class="<%= randomCar['class'] %>">
+          <div class="card" data-class="<%= randomCar['Class'] %>">
             <div class="carImg">
               <a
                 href="/gallery/<%= randomCar['uid'] %>"
                 class="carClass <%= randomCar['uid'] %>"
               >
-                <img src="<%= randomCar['image_url'] %>" alt="Racecar" />
+                <img
+                  src="<%= randomCar['image_link'] %>"
+                  alt="this is the car of the day"
+                />
               </a>
             </div>
             <div class="textSection1">
-              <h3><%= randomCar["name"] %></h3>
-              <h3><%= randomCar["brand"] %></h3>
-              <h4><%= randomCar["class"] %></h4>
+              <h3><%= randomCar["display_name"] %></h3>
+              <h3><%= randomCar["Brand"] %></h3>
+              <h4><%= randomCar["Class"] %></h4>
             </div>
           </div>
         </div>
