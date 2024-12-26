@@ -108,12 +108,16 @@ const fetchCarOfTheDay = async () => {
   // from carGalleryListing: UID and display_name
   // from carData: name, class, brand
   let query = `
-    SELECT carGalleryListing.UID, 
-           carGalleryListing.display_name, 
-           carData.name AS main_car_name, 
-           carData.class, 
-           carData.brand FROM carGalleryListing
-    JOIN carData ON carGalleryListing.main_car = carData.UID;
+    SELECT 
+      carGalleryListing.UID, 
+      carGalleryListing.display_name, 
+      carData.name AS main_car_name, 
+      carData.class, 
+      carData.brand, 
+      carImages.image_link
+    FROM carGalleryListing
+    JOIN carData ON carGalleryListing.main_car = carData.UID
+    JOIN carImages ON carGalleryListing.UID = carImages.main_car;
   `;
 
   // this promise thing again, like in lines 88-103, only difference is its not
@@ -124,6 +128,7 @@ const fetchCarOfTheDay = async () => {
         console.error('Error fetching data from the database:', error);
         reject(error);
       } else {
+        console.log(data);
         resolve(data);
       }
     });
