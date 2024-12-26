@@ -102,10 +102,7 @@
           <!-- displays the information about a random car -->
           <div class="card" data-class="<%= randomCar['Class'] %>">
             <div class="carImg">
-              <a
-                href="/gallery/<%= randomCar['uid'] %>"
-                class="carClass <%= randomCar['uid'] %>"
-              >
+              <a href="/gallery" class="carClass">
                 <img
                   src="<%= randomCar['image_link'] %>"
                   alt="this is the car of the day"

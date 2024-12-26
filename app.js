@@ -128,7 +128,6 @@ const fetchCarOfTheDay = async () => {
         console.error('Error fetching data from the database:', error);
         reject(error);
       } else {
-        console.log(data);
         resolve(data);
       }
     });
@@ -282,8 +281,16 @@ app.get('/gallery/:carName', async (req, res) => {
 
   // searches for the car in the database via SQL
   const requestedCar = await loadFromDatabase(
-    `SELECT * FROM carData WHERE uid = ${carName}`
+    `SELECT 
+      carData.*
+    FROM 
+        carGalleryListing
+    JOIN 
+        carData ON carGalleryListing.main_car = carData.UID
+    WHERE 
+        carGalleryListing.UID = ${carName}`
   );
+
   // finds the images for the selected car
   const carImages = await loadFromDatabase(
     `SELECT * FROM carImages WHERE main_car = ${carName}`
@@ -293,7 +300,7 @@ app.get('/gallery/:carName', async (req, res) => {
     images.push(element['image_link']);
   });
 
-  if (!requestedCar) {
+  if (requestedCar.length == 0) {
     // if the car is not found it leads to the 404 page
     res.render('404', { message: 'This car could not be found' });
   } else {
