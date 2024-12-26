@@ -8,7 +8,7 @@
       content="paul  (isdadev) & phillip schlichting (philrico)"
     />
     <link rel="stylesheet" href="/style.css" />
-    <title><%= carData['name'] %></title>
+    <title><%= carData['Name'] %></title>
   </head>
   <body id="carpage">
     <header>
@@ -38,18 +38,36 @@
     <main>
       <div class="container">
         <div class="image">
-          <img src="/assets/testimages/03.webp" alt="#" />
+          <button id="control-button-left">
+            <img
+              src="/assets/arrow-left.png"
+              alt="left arrow"
+              height="30px"
+              class="control-button"
+            />
+          </button>
+          <button id="control-button-right">
+            <img
+              src="/assets/arrow-right.png"
+              alt="right arrow"
+              height="30px"
+              class="control-button"
+            />
+          </button>
+          <!-- image with the path for the first image -->
+          <img src="<%= images[0] %>" alt="" class="displayedCar" />
         </div>
         <div class="info">
-          <h2><%= carData['name'] %></h2>
-          <h3><%= carData['class'] %> <%= carData['brand'] %></h3>
+          <!-- displays the information about the car -->
+          <h2><%= carData['Name'] %></h2>
+          <h3><%= carData['Class'] %> <%= carData['Brand'] %></h3>
           <table id="table">
+            <!-- loop through each entry in the JSON object and returns key and value -->
             <% Object.entries(carData).forEach(([key, value]) => { %>
             <tr>
               <td><%= key %></td>
               <td><%= value %></td>
             </tr>
-
             <% }) %>
           </table>
         </div>
@@ -62,6 +80,14 @@
         <p><a href="/privacy">privacy</a></p>
       </div>
     </footer>
+
+    <script>
+      // imageLinks is an array containg all the paths for the images
+      const imageLinks = <%- JSON.stringify(images) %>;
+    </script>
+
+    <!-- import of javascript -->
+    <script src="../scripts/image-slider-carpage.js"></script>
     <script src="../scripts/functionality.js"></script>
   </body>
 </html>

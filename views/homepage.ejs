@@ -38,30 +38,29 @@
     <main>
       <section class="header-section">
         <div class="media">
-          <video muted id="header-video-1" autoplay>
-            <source src="assets/video.mp4" />
-          </video>
           <img
-            src="assets/header-image-1.png"
+            src="#"
             alt="headerimg1"
             id="header-image-1"
+            class="displayedCar"
           />
-          <img
-            src="assets/header-image-2.png"
-            alt="headerimg2"
-            id="header-image-2"
-          />
-        </div>
-
-        <div class="cta-button">
-          <button id="cta">Learn more</button>
         </div>
 
         <button id="control-button-left">
-          <img src="assets/arrow-left.png" alt="left arrow" height="30px" />
+          <img
+            src="/assets/arrow-left.png"
+            alt="left arrow"
+            height="30px"
+            class="control-button"
+          />
         </button>
         <button id="control-button-right">
-          <img src="assets/arrow-right.png" alt="right arrow" height="30px" />
+          <img
+            src="/assets/arrow-right.png"
+            alt="right arrow"
+            height="30px"
+            class="control-button"
+          />
         </button>
       </section>
 
@@ -100,6 +99,7 @@
       <section class="COTD-section" id="COTD-section">
         <h2>We present you the car of the month</h2>
         <div class="COTD">
+          <!-- displays the information about a random car -->
           <div class="card" data-class="<%= randomCar['class'] %>">
             <div class="carImg">
               <a
@@ -128,10 +128,13 @@
     </footer>
 
     <script>
-      document.querySelector('#cta').addEventListener('click', () => {
-        window.location.href = '#COTD-section';
-      });
+      // array containing links for the videos and images for the hero-section
+      const imageLinks = <%- JSON.stringify(mediaArray) %>;
+
+      // sets the src of the headerimage to the first image
+      document.querySelector('.displayedCar').src = imageLinks[0];
     </script>
+    <script src="/scripts/image-slider-carpage.js"></script>
     <script src="/scripts/functionality.js"></script>
   </body>
 </html>
