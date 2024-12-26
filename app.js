@@ -8,7 +8,7 @@
 // IMPORT SECTION
 // **********************************************************************************************************
 
-// require file to get the public and private key
+// require env file for secret data that should not be in a github commit
 require('dotenv').config({ path: '../.env' });
 
 // import necessary modules
@@ -22,7 +22,6 @@ const emailjs = require('@emailjs/nodejs');
 // VARIABLE SECTION
 // **********************************************************************************************************
 
-let carData = []; // initialize carData as an empty array
 let captchaCode; // keeps track of the current right captcha
 
 // **********************************************************************************************************
@@ -50,6 +49,7 @@ app.listen(PORT, () => {
 // CONFIGURATION FOR EMAILJS
 // **********************************************************************************************************
 
+// setting up emailjs with private and publickey
 emailjs.init({
   publicKey: process.env.EMAILJS_PUBLIC_KEY,
   privateKey: process.env.EMAILJS_PRIVATE_KEY,
@@ -67,7 +67,7 @@ emailjs.init({
 // connect to the SQLite database
 const db = new sqlite3.Database(
   // filepath
-  path.join(__dirname, 'carDBLong.db'),
+  path.join(__dirname, 'prod.db'),
   // method
   sqlite3.OPEN_READWRITE,
   // error handling
@@ -80,36 +80,88 @@ const db = new sqlite3.Database(
   }
 );
 
-// load car data from the database on server start
-db.all('SELECT * FROM carDBLong', (error, rows) => {
-  if (error) {
-    console.error('Error fetching data from the database:', error);
-  } else {
-    carData = rows; // store the data in carData
-    console.log('Car data loaded successfully.');
-  }
-});
+// function to load stuff from database
+const loadFromDatabase = async (query) => {
+  // empty array for the result
+  let arr = [];
+
+  // query the database
+  return new Promise((resolve, reject) => {
+    db.all(query, (error, data) => {
+      // sends error message and rejects promise when error
+      if (error) {
+        console.error('Error fetching data from the database:', error);
+        reject(error);
+      } else {
+        // returns data in the form of an array if successful
+        data.forEach((element) => {
+          arr.push(element);
+        });
+        resolve(arr);
+      }
+    });
+  });
+};
+
+const fetchCarOfTheDay = async () => {
+  // this query selects specific elements from the 2 important tables
+  // from carGalleryListing: UID and display_name
+  // from carData: name, class, brand
+  let query = `
+    SELECT carGalleryListing.UID, 
+           carGalleryListing.display_name, 
+           carData.name AS main_car_name, 
+           carData.class, 
+           carData.brand FROM carGalleryListing
+    JOIN carData ON carGalleryListing.main_car = carData.UID;
+  `;
+
+  // this promise thing again, like in lines 88-103, only difference is its not
+  // put into an array when resolving
+  return new Promise((resolve, reject) => {
+    db.all(query, (error, data) => {
+      if (error) {
+        console.error('Error fetching data from the database:', error);
+        reject(error);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+};
 
 // **********************************************************************************************************
 // ROUTES SECTION
 // **********************************************************************************************************
 
 // route to the homepage
-app.get('/', (req, res) => {
-  // checks if the length of carData is bigger than 0
-  if (carData.length > 0) {
-    // selects a random car from the loaded array containg all cars
-    const randomCar = carData[Math.floor(Math.random() * carData.length)];
-    // renders the homepage and passes the car
-    res.render('homepage', { randomCar });
-  } else {
-    // if there was an error with getting carData it passes randomCar = null
-    res.render('homepage', { randomCar: null });
+app.get('/', async (req, res) => {
+  try {
+    // Fetch all cars
+    const data = await fetchCarOfTheDay();
+
+    // Select a random car (with math yeah)
+    const randomCar = data[Math.floor(Math.random() * data.length)];
+
+    // array containg filepaths for each element on the start-page
+    const mediaArray = [
+      '/assets/start_1.webp',
+      '/assets/start_2.webp',
+      '/assets/start_3.webp',
+    ];
+
+    // Render the homepage and pass the car and all the images for the start
+    res.render('homepage', { randomCar, mediaArray });
+  } catch (error) {
+    // error handling
+    console.error('Error:', error);
+    res.status(500).send('Internal Server Error');
   }
 });
 
 // route to get to the contact section
 app.get('/contact', (req, res) => {
+  // renders contact page
   res.render('contact');
 });
 
@@ -160,6 +212,8 @@ app.post('/contact/refreshCaptcha', (req, res) => {
   res.json({ code1: num1, code2: num2, result: result });
 });
 
+// only issue is that its server-side, so if multiple people access,
+// they have to reload the captcha
 // route to update captcha server-side
 app.post('/contact/updateCaptchaCode', (req, res) => {
   // updates captchaCode to the code being sent via the post request
@@ -170,36 +224,78 @@ app.post('/contact/updateCaptchaCode', (req, res) => {
 
 // route for the impressum
 app.get('/impressum', (req, res) => {
+  // renders impressum page
   res.render('impressum');
 });
 
 // route for the privacy-agreement
 app.get('/privacy', (req, res) => {
+  // renders privacy page
   res.render('privacy');
 });
 
 // route leading to the gallery
-app.get('/gallery', (req, res) => {
-  res.render('gallery', { carData }); // Pass carData to the template
+app.get('/gallery', async (req, res) => {
+  try {
+    // sql statement
+    // selects specific elements, then returns only one unique combination
+    // also only selects the "smallest" image in the image_link,
+    // basically just gets the first one
+    const sqlStatement = `SELECT 
+          carGalleryListing.UID, 
+          carGalleryListing.display_name, 
+          carData.name AS main_car_name, 
+          carData.class, 
+          carData.brand, 
+          MIN(carImages.image_link) AS car_image
+          FROM carGalleryListing
+          JOIN carData ON carGalleryListing.main_car = carData.UID
+          JOIN carImages ON carGalleryListing.UID = carImages.main_car
+      GROUP BY 
+          carGalleryListing.UID, 
+          carGalleryListing.display_name, 
+          carData.name, 
+          carData.class, 
+          carData.brand;`;
+    // gets the data from the database
+    const carData = await loadFromDatabase(sqlStatement);
+
+    // Pass carData to the template
+    res.render('gallery', { carData });
+  } catch (error) {
+    // error handling
+    console.error('Error loading carData:', error);
+    res.status(500).send('Internal Server Error');
+  }
 });
 
 // dynamic routes for each car inside the gallery
-app.get('/gallery/:carName', (req, res) => {
+app.get('/gallery/:carName', async (req, res) => {
   // gets the carname from the request parameters
   const carName = req.params.carName;
+  let images = [];
 
   // searches for the car in the database via SQL
-  db.get('SELECT * FROM carDBLong WHERE uid = ?', [carName], (err, row) => {
-    // if the car is not found or there was an error it leads to the 404 page
-    if (err || !row) {
-      res.render('404');
-    } else {
-      // if the car is found and no error it renders the carpage with the dynamic route
-      // and passes the data for that selected car to the ejs template
-      sanitize(row);
-      res.render('carpage', { carData: sanitize(row) });
-    }
+  const requestedCar = await loadFromDatabase(
+    `SELECT * FROM carData WHERE uid = ${carName}`
+  );
+  // finds the images for the selected car
+  const carImages = await loadFromDatabase(
+    `SELECT * FROM carImages WHERE main_car = ${carName}`
+  );
+
+  carImages.forEach((element) => {
+    images.push(element['image_link']);
   });
+
+  if (!requestedCar) {
+    // if the car is not found it leads to the 404 page
+    res.render('404', { message: 'This car could not be found' });
+  } else {
+    // if the car is found and no error it renders the carpage with the dynamic route
+    // and passes the data for that selected car to the ejs template
+    res.render('carpage', { carData: sanitize(requestedCar[0]), images });
+  }
 });
 
 // **********************************************************************************************************
@@ -208,58 +304,29 @@ app.get('/gallery/:carName', (req, res) => {
 
 // renders the 404 not found page if the page doesn't exist
 app.use((req, res) => {
-  res.status(404).render('404');
+  res
+    .status(404)
+    .render('404', { message: 'The requested page could not be found' });
 });
 
 // **********************************************************************************************************
 // MISC SECTION
 // **********************************************************************************************************
 
+// function to sanitize the data
+// in this case it only checks that UID is not displayed on the page
 const sanitize = (rowOfData) => {
-  let c = 0;
+  // creates a new Object
   let dict = new Object();
+  // loops through all the entries in original Object, being the input
   Object.entries(rowOfData).forEach(([key, value]) => {
-    if (key === 'uid' || key === 'image_url') {
+    // checks if the key is UID, then it skips it
+    if (key === 'UID') {
       return;
     }
-    let finishedKey = key.substring(0, 1).toUpperCase() + key.substring(1);
-    finishedKey = finishedKey.replaceAll('_', ' ');
-
-    switch (c) {
-      case 3:
-        value = value + ' kg';
-        break;
-
-      case 6:
-        value = value + ' hp';
-        break;
-
-      case 7:
-        value = value + ' nm';
-        break;
-
-      case 8:
-        value = value + ' km/h';
-        break;
-
-      case 11:
-        value = value + ' l/100km';
-        break;
-
-      case 12:
-        value = value + ' s';
-        break;
-
-      case 13:
-        value = value + ' €';
-        break;
-
-      default:
-        break;
-    }
-
-    dict[finishedKey] = value;
-    c++;
+    // then returns the key and value to the new Object
+    dict[key] = value;
   });
+  // returns the new Object
   return dict;
 };

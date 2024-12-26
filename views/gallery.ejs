@@ -49,23 +49,24 @@
       </div>
 
       <div class="gallery-container">
-        <% for( let i = 0; i < carData.length; i++ ) { %>
-        <div class="card" data-class="<%= carData[i]['class'] %>">
+        <!-- just displays some info about each car -->
+        <% carData.forEach((carData) => { %>
+        <div class="card" data-class="<%= carData['Class'] %>">
           <div class="carImg">
             <a
-              href="/gallery/<%= carData[i]['uid'] %>"
-              class="carClass <%= carData[i]['uid'] %>"
+              href="/gallery/<%= carData['UID'] %>"
+              class="carClass <%= carData['UID'] %>"
             >
-              <img src="<%= carData[i]['image_url'] %>" alt="Racecar" />
+              <img src="<%= carData['car_image'] %>" alt="Racecar" />
             </a>
           </div>
           <div class="textSection1">
-            <h3><%= carData[i]["name"] %></h3>
-            <h3><%= carData[i]["brand"] %></h3>
-            <h4><%= carData[i]["class"] %></h4>
+            <h3><%= carData["display_name"] %></h3>
+            <h3><%= carData["Brand"] %></h3>
+            <h4><%= carData["Class"] %></h4>
           </div>
         </div>
-        <% } %>
+        <% }) %>
       </div>
     </main>
 
