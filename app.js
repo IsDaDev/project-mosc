@@ -154,8 +154,14 @@ app.get('/', async (req, res) => {
       '/assets/start_3.webp',
     ];
 
+    const textArray = [
+      'MOSC AUTOMOBILE',
+      'MEET OUR ALPINE A424 TEAM',
+      'MEET OUR BMW M4 TEAM',
+    ];
+
     // Render the homepage and pass the car and all the images for the start
-    res.render('homepage', { randomCar, mediaArray });
+    res.render('homepage', { randomCar, mediaArray, textArray });
   } catch (error) {
     // error handling
     console.error('Error:', error);

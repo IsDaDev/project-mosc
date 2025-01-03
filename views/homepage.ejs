@@ -44,6 +44,8 @@
             id="header-image-1"
             class="displayedCar"
           />
+          <h1 id="header-section-h1"></h1>
+          <h1 id="header-section-h2"></h1>
         </div>
 
         <button id="control-button-left">
@@ -71,27 +73,21 @@
           </div>
           <div class="text-section">
             <h1>About us</h1>
-            <ul>
-              <li>
-                <h2>Who are we?</h2>
-                <p>
-                  At Project MOSC, we are a dedicated team of automotive
-                  designers and racing enthusiasts united by our love for speed
-                  and innovation. Our diverse backgrounds in engineering,
-                  graphic design, and motorsport allow us to push the boundaries
-                  of racecar design.
-                </p>
-              </li>
-              <li>
-                <h2>What are we trying to achieve?</h2>
-                <p>
-                  Our mission is to educate and inspire. We share our passion
-                  for racecars with both enthusiasts and newcomers, fostering a
-                  deeper understanding of the artistry, engineering, and history
-                  behind these incredible machines.
-                </p>
-              </li>
-            </ul>
+            <h2>Who are we?</h2>
+            <p>
+              At Project MOSC, we are a dedicated team of automotive designers
+              and racing enthusiasts united by our love for speed and
+              innovation. Our diverse backgrounds in engineering, graphic
+              design, and motorsport allow us to push the boundaries of racecar
+              design.
+            </p>
+            <h2>What are we trying to achieve?</h2>
+            <p>
+              Our mission is to educate and inspire. We share our passion for
+              racecars with both enthusiasts and newcomers, fostering a deeper
+              understanding of the artistry, engineering, and history behind
+              these incredible machines.
+            </p>
           </div>
         </div>
       </section>
@@ -130,11 +126,13 @@
     <script>
       // array containing links for the videos and images for the hero-section
       const imageLinks = <%- JSON.stringify(mediaArray) %>;
-
-      // sets the src of the headerimage to the first image
-      document.querySelector('.displayedCar').src = imageLinks[0];
+      // array containg the text to be displayed
+      const textToDisplay = <%- JSON.stringify(textArray) %>;
     </script>
-    <script src="/scripts/image-slider-carpage.js"></script>
+
+    <!-- js imports for important files -->
+    <script src="/scripts/image-slider-homepage.js"></script>
     <script src="/scripts/functionality.js"></script>
+    <script></script>
   </body>
 </html>
