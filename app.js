@@ -35,12 +35,12 @@ const app = express();
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
 
-// middleware to parse the body of files
+// middleware to parse the body of requests
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // start the server
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
@@ -154,6 +154,7 @@ app.get('/', async (req, res) => {
       '/assets/start_3.webp',
     ];
 
+    // array containg text for images
     const textArray = [
       'MOSC AUTOMOBILE',
       'MEET OUR ALPINE A424 TEAM',
@@ -302,6 +303,7 @@ app.get('/gallery/:carName', async (req, res) => {
     `SELECT * FROM carImages WHERE main_car = ${carName}`
   );
 
+  // returns every found element into an array
   carImages.forEach((element) => {
     images.push(element['image_link']);
   });
