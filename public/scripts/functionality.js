@@ -13,7 +13,7 @@ const changeNavVisible = () => {
     // removes the class visible
     navMobileLinks.classList.remove('visible');
     // sets zIndex back to 10
-    navMobile.style.zIndex = 10;
+    navMobile.style.zIndex = 2;
   } else {
     // makes the links appear
     navMobileLinks.style.display = 'block';
