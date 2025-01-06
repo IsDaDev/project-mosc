@@ -85,7 +85,7 @@ html {
 
 #home .intro-section {
   height: auto;
-  padding: 3rem;
+  padding: 1rem 3rem;
   color: white;
   box-sizing: border-box;
 }
@@ -99,16 +99,25 @@ html {
   grid-template-columns: 1fr 1fr;
 }
 
+#home .intro-section .text-section {
+  align-content: center;
+  margin-bottom: 3rem;
+}
+
 #home .intro-section .text-section p {
   text-align: justify;
   line-height: 20px;
   letter-spacing: 1px;
 }
 
+#home .intro-section .image-section {
+  align-items: center;
+  justify-content: center;
+  margin: auto auto;
+}
+
 #home .intro-section .image-section img {
-  width: 75%;
-  height: 85%;
-  margin: 5% 15%;
+  width: 100%;
 }
 
 #home .COTD-section {
@@ -445,6 +454,7 @@ footer {
 footer .footer-links {
   display: flex;
   gap: 1rem;
+  z-index: 100;
 }
 
 footer .footer-links a {
