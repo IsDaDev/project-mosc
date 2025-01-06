@@ -12,7 +12,7 @@ const changeNavVisible = () => {
     navMobileSymbol.children[0].src = '/assets/navbar-mobile-bars.png';
     // removes the class visible
     navMobileLinks.classList.remove('visible');
-    // sets zIndex back to 10
+    // sets zIndex back to 2
     navMobile.style.zIndex = 2;
   } else {
     // makes the links appear
